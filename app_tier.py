@@ -34,13 +34,6 @@ request_queue_url = sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME
 
 def get_message(queue_url):
     try:
-        # sqs_response = app_sqs_client.receive_message(
-        #     QueueUrl=queue_url,
-        #     MaxNumberOfMessages=1,
-        #     MessageAttributeNames=['All'],
-        #     VisibilityTimeout=8,
-        #     WaitTimeSeconds=20
-        # )
         sqs_response = app_sqs_client.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1, WaitTimeSeconds=20)
         message = sqs_response.get('Messages', None)
         if message:
@@ -76,13 +69,6 @@ def write_data_to_s3(file_name, bucket, data, debug=None):
     except ClientError as e:
         logging.error(e)
 
-# def store_image_to_s3(file_name, bucket_name, image_file):
-#     try:
-#         response = s3_client.upload_file(file_name, bucket_name, image_file)
-#         print("image_loaded")
-#     except ClientError as e:
-#         logging.error(e)
-
 
 # Write to a binary file
 def write_to_file(image_name, result):
@@ -91,12 +77,6 @@ def write_to_file(image_name, result):
         f.close()
 
 
-# def save_result_file_into_bucket(file_name, bucket_name, object_name):
-#     try:
-#         response = s3_client.upload_file(file_name, bucket_name, object_name)
-#     except ClientError as e:
-#         logging.error(e)
-    
 def get_image_after_decoding_base64(msg_filename_key, msg_value):
     msg_value = bytes(msg_value, 'utf-8')
     with open('encode.bin', "wb") as file:
@@ -130,11 +110,6 @@ if __name__ == '__main__':
         message = get_message(sqs_management_instance.get_queue_url())
         if message is None:
             continue
-
-        # message_body = message.get("Body")
-        # response_json = json.loads(message_body)
-        # msg_filename_key = response_json.get('key')
-        # msg_base64_encoded_value = response_json.get('value')
 
         file_name, file_content = get_file_contents(message)
         
