@@ -1,6 +1,5 @@
 from quart import Quart, request, jsonify
 from PIL import Image
-#from time import sleep
 import base64
 import asyncio
 import boto3
