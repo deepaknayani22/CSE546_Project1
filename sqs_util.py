@@ -42,9 +42,8 @@ def send_message(queueUrl, msg):
 def receive_message(queueUrl):
     response = client.receive_message(
         QueueUrl=queueUrl,
-        MaxNumberOfMessages=10,
-        WaitTimeSeconds=10,
-        VisibilityTimeout=123,
+        MaxNumberOfMessages=1,
+        WaitTimeSeconds=10
     )
     return response.get('Messages', [])
     # print(f"Number of messages received: {len(response.get('Messages', []))}")
