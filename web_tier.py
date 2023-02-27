@@ -12,15 +12,6 @@ from logging.config import dictConfig
 #from threading import Thread
 import threading
 
-# dictConfig({
-#     'version': 1,
-#     'loggers': {
-#         'quart.app': {
-#             'level': 'DEBUG',
-#         },
-#     },
-# })
-
 classification_output = {}
 
 REQUEST_QUEUE_NAME = settings.SQS_INPUT
@@ -48,9 +39,7 @@ def collect_response():
 async def get_result(key):
     while True:
         await asyncio.sleep(1)
-        # output_val = '{0}'.format(classification_output.pop(key, None))
-        # print("output from webtier is " + str(output_val))
-        # return output_val
+
         if key in classification_output:
             output_to_be_returned = '{0}'.format(classification_output[key])
             print("WebTier Output returned" + str(output_to_be_returned))
@@ -73,11 +62,6 @@ async def classify_image():
     # receive message from SQS
     return await get_result(key)
   
-# @app.route('/health', methods=['GET'])
-# def healthcheck():
-#   app.logger.debug('OK')
-#   return "200"
-
 
 resultsThread = threading.Thread(target=collect_response)
 resultsThread.start()
