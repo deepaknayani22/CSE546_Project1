@@ -9,17 +9,14 @@ import sqs_util
 from subprocess import check_output
 import json
 
-# Constants
 S3_INPUT_BUCKET = settings.S3_INPUT
 S3_OUTPUT_BUCKET = settings.S3_OUTPUT
 SQS_REQUEST_QUEUE_NAME = settings.SQS_INPUT
 SQS_RESPONSE_QUEUE_NAME = settings.SQS_OUTPUT
 
-# initialization and instantiations
 
 sqs_management_instance = sqs_util
 
-# app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
 app_sqs_client = boto3.client('sqs',
                               region_name=settings.REGION_NAME, aws_access_key_id=settings.KEY,
                               aws_secret_access_key=settings.KEY_PASS)
@@ -70,7 +67,6 @@ def write_data_to_s3(file_name, bucket, data, debug=None):
         logging.error(e)
 
 
-# Write to a binary file
 def write_to_file(image_name, result):
     with open(image_name, "wb") as f:
         f.write(bytes((result), 'utf8'))
@@ -123,7 +119,7 @@ if __name__ == '__main__':
 
         print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " Image File Name :" + file_name)
         print("Saved to s3 output bucket")
-        # removing the Image png File
+        
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted_json)
 
 
@@ -132,6 +128,5 @@ if __name__ == '__main__':
         write_to_file(file_name_without_jpg, classified_predicted_result)
         write_data_to_s3(file_name_without_jpg, S3_OUTPUT_BUCKET, file_name_without_jpg, "Writing output to S3")
         
-        # Deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
         os.remove(file_name_without_jpg)
