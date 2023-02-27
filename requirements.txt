@@ -1,0 +1,6 @@
+boto3
+flask
+quart
+Pillow
+botocore
+requests
