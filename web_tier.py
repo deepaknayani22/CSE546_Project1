@@ -9,7 +9,8 @@ import settings
 import time
 from sqs_util import *
 from logging.config import dictConfig
-from threading import Thread
+#from threading import Thread
+import threading
 
 # dictConfig({
 #     'version': 1,
@@ -26,7 +27,7 @@ REQUEST_QUEUE_NAME = settings.SQS_INPUT
 RESPONSE_QUEUE_NAME = settings.SQS_OUTPUT
 
 app = Quart(__name__)
-
+lock = threading.Lock()
 def collect_response():
     while True:
         queue_url = get_queue_url(settings.SQS_OUTPUT)
@@ -35,9 +36,14 @@ def collect_response():
         for message in response:
             message_body = message['Body']
             message_dict = json.loads(message_body)
-            classification_output[message_dict['key']] = message_dict['value']
+            
+            lock.acquire()
+            try:
+                classification_output[message_dict['key']] = message_dict['value']
+            finally:
+                lock.release()
             delete_message(queue_url, message['ReceiptHandle'])
-        time.sleep(1)
+        #time.sleep(1)
 
 async def get_result(key):
     while True:
@@ -73,6 +79,6 @@ async def classify_image():
 #   return "200"
 
 
-resultsThread = Thread(target=collect_response)
+resultsThread = threading.Thread(target=collect_response)
 resultsThread.start()
 app.run(host='0.0.0.0', debug=True, port=6060)
